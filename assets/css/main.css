@@ -339,6 +339,11 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .post-card {
+    min-height: auto;
+    padding-bottom: 26px;
+  }
+
   .category-tile + .category-tile {
     border-left: 0;
     border-top: 1px solid var(--line);
