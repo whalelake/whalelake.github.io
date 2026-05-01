@@ -1,0 +1,78 @@
+---
+layout: default
+title: Home
+---
+
+{% assign featured_post = site.posts | where: "featured", true | first %}
+{% assign lead_post = featured_post | default: site.posts.first %}
+
+<section class="hero-grid">
+  <article class="lead-story">
+    <div class="eyebrow">Issue 001 / Personal Magazine</div>
+    <h1>{{ lead_post.title | default: "Thinking with code, data, and public weather." }}</h1>
+    <p>{{ lead_post.excerpt | default: site.description }}</p>
+    {% if lead_post %}
+      <a href="{{ lead_post.url | relative_url }}">Read the lead story</a>
+    {% endif %}
+  </article>
+
+  <aside class="issue-panel" aria-label="Latest issue notes">
+    <div>
+      <div class="eyebrow">Editor's Desk</div>
+      <p>개발자의 작업대, 데이터 분석가의 노트, 시민의 관찰을 한 곳에 모읍니다.</p>
+    </div>
+    {% for post in site.posts limit: 3 %}
+      <article class="issue-card">
+        <div class="kicker">{{ site.category_labels[post.category] | default: post.category }}</div>
+        <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+        <p>{{ post.excerpt }}</p>
+      </article>
+    {% endfor %}
+  </aside>
+</section>
+
+<section aria-labelledby="latest-posts">
+  <div class="section-heading">
+    <h2 id="latest-posts">Latest</h2>
+    <a href="{{ '/archive/' | relative_url }}">All posts</a>
+  </div>
+
+  <div class="post-grid">
+    {% for post in site.posts limit: 6 %}
+      <article class="post-card">
+        <div class="kicker">{{ site.category_labels[post.category] | default: post.category }}</div>
+        <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+        <p>{{ post.excerpt }}</p>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section aria-labelledby="categories">
+  <div class="section-heading">
+    <h2 id="categories">Departments</h2>
+  </div>
+
+  <div class="category-rail">
+    <div class="category-tile">
+      <strong>Development</strong>
+      <span>코드, 도구, 자동화, 시행착오.</span>
+    </div>
+    <div class="category-tile">
+      <strong>Current Affairs</strong>
+      <span>뉴스의 구조와 사회적 맥락.</span>
+    </div>
+    <div class="category-tile">
+      <strong>Data Analysis</strong>
+      <span>지표, 모델, 해석, 시각화.</span>
+    </div>
+    <div class="category-tile">
+      <strong>Life</strong>
+      <span>일상에서 길어 올린 생각.</span>
+    </div>
+    <div class="category-tile">
+      <strong>Projects</strong>
+      <span>만드는 과정과 공개 회고.</span>
+    </div>
+  </div>
+</section>

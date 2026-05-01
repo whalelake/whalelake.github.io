@@ -1,0 +1,42 @@
+title: whalelake
+description: "Development, public affairs, data analysis, everyday notes, and project records."
+url: "https://whalelake.github.io"
+baseurl: ""
+lang: ko-KR
+timezone: Asia/Seoul
+
+author:
+  name: whalelake
+  email:
+
+permalink: /:categories/:year/:month/:day/:title/
+
+markdown: kramdown
+highlighter: rouge
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+collections:
+  posts:
+    output: true
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+
+category_labels:
+  development: Development
+  affairs: Current Affairs
+  data: Data Analysis
+  life: Life
+  projects: Projects
+
+exclude:
+  - docs/superpowers
+  - README.md
