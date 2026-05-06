@@ -1,6 +1,6 @@
 ---
 title: "네이버 검색광고 자동 입찰 시스템을 만들며 배운 것"
-date: 2026-05-06 16:00:00 +0900
+date: 2026-05-06 15:30:00 +0900
 categories: [Projects]
 tags: [automation, adtech, naver, python, bidding]
 excerpt: "입찰 자동화는 단순히 가격을 올리고 내리는 일이 아니었다. 성과 데이터, 전략, 안전장치, 관측성을 함께 설계하는 운영 시스템에 가까웠다."
