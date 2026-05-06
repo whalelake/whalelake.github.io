@@ -1,11 +1,13 @@
 ---
 title: "제주 렌터카 가격 비교기를 만들며 배운 것"
 date: 2026-05-01 17:00:00 +0900
-category: projects
+categories: [Projects]
+tags: [automation, data, crawling, jeju]
 excerpt: "가격 비교는 단순히 숫자를 모으는 일이 아니었다. 서로 다른 플랫폼의 데이터 구조를 같은 질문으로 번역하는 작업이었다."
-image: /assets/images/posts/jeju-rental-car-price-comparison-cover.png
-image_alt: "제주 렌터카 4개 플랫폼의 가격 데이터가 하나의 가격 피벗 테이블로 정리되는 매거진형 대표 이미지"
-featured: true
+image:
+  path: /assets/images/posts/jeju-rental-car-price-comparison-cover.png
+  alt: "제주 렌터카 4개 플랫폼의 가격 데이터가 하나의 가격 피벗 테이블로 정리되는 대표 이미지"
+pin: true
 ---
 
 제주 렌터카 가격 비교기를 만들면서 가장 먼저 든 생각은 “가격 비교”라는 말이 생각보다 단순하지 않다는 것이었다. 겉으로 보면 여러 사이트에서 가격을 가져와 가장 싼 차를 찾는 일처럼 보인다. 하지만 실제로 코드를 쓰기 시작하면 문제는 바로 흐려진다. 같은 차량이 플랫폼마다 다른 이름으로 표시되고, 같은 업체도 표기 방식이 다르며, 가격 안에 포함된 정보의 의미도 조금씩 다르다. 결국 이 프로젝트의 핵심은 크롤링 자체보다 “서로 다른 플랫폼의 데이터를 같은 질문으로 비교할 수 있게 만드는 일”에 가까웠다.

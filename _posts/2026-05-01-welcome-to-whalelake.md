@@ -1,9 +1,9 @@
 ---
 title: "whalelake를 시작하며"
 date: 2026-05-01 09:00:00 +0900
-category: life
+categories: [Life]
+tags: [blog, notes, whalelake]
 excerpt: "개발자의 작업대, 데이터 분석가의 노트, 시민의 관찰을 한곳에 모으는 개인 매거진을 시작한다."
-featured: false
 ---
 
 이 블로그는 하나의 주제로만 묶이지 않는다. 개발을 하다가 발견한 문제, 데이터를 보며 생긴 의문, 시사를 읽으며 떠오른 맥락, 프로젝트를 만들며 남겨야 할 결정들이 모두 이곳의 재료가 된다.

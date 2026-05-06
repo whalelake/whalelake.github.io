@@ -1,9 +1,9 @@
 ---
 title: "프로젝트 로그는 공개 기억이다"
 date: 2026-05-01 11:00:00 +0900
-category: projects
+categories: [Projects]
+tags: [projects, logs, retrospective]
 excerpt: "프로젝트 기록은 결과물을 설명하는 문서가 아니라, 판단과 변경의 흐름을 남기는 공개 기억이다."
-featured: false
 ---
 
 프로젝트는 결과물만 보면 단순해 보인다. 하지만 실제로는 작고 많은 결정의 누적이다. 무엇을 먼저 만들지, 무엇을 버릴지, 어떤 문제를 지금 고치고 어떤 문제는 다음으로 미룰지 결정하는 과정이 프로젝트의 성격을 만든다.

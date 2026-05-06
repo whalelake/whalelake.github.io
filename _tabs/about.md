@@ -1,16 +1,9 @@
 ---
-layout: default
-title: About
-permalink: /about/
+icon: fas fa-info-circle
+order: 4
 ---
 
-<section class="page-content">
-
-<div class="eyebrow">About</div>
-
-# whalelake
-
-개발, 시사, 데이터 분석, 일상, 프로젝트 기록을 엮어 쓰는 개인 매거진입니다.
+개발, 시사, 데이터 분석, 일상, 프로젝트 기록을 엮어 쓰는 개인 블로그입니다.
 
 이곳의 글은 빠른 메모와 긴 분석 사이에 있습니다. 어떤 글은 코드 조각에서 출발하고, 어떤 글은 사회 이슈를 읽다가 시작하며, 어떤 글은 데이터를 만지며 생긴 질문을 따라갑니다.
 
@@ -21,5 +14,3 @@ permalink: /about/
 - **Data Analysis**: 데이터셋, 지표, 모델링, 해석의 과정
 - **Life**: 일상에서 생긴 관찰과 생각
 - **Projects**: 만들고 실험하고 정리한 작업 로그
-
-</section>
