@@ -243,6 +243,21 @@ a {
   padding-bottom: 28px;
 }
 
+.post-cover {
+  border-bottom: 1px solid var(--line);
+  margin: -4px 0 34px;
+  padding-bottom: 28px;
+}
+
+.post-cover img {
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line);
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
 .post-header h1,
 .page-content h1 {
   font-family: Georgia, "Apple SD Gothic Neo", "Malgun Gothic", "Times New Roman", serif;

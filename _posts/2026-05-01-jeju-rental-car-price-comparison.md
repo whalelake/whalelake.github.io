@@ -3,6 +3,8 @@ title: "제주 렌터카 가격 비교기를 만들며 배운 것"
 date: 2026-05-01 17:00:00 +0900
 category: projects
 excerpt: "가격 비교는 단순히 숫자를 모으는 일이 아니었다. 서로 다른 플랫폼의 데이터 구조를 같은 질문으로 번역하는 작업이었다."
+image: /assets/images/posts/jeju-rental-car-price-comparison-cover.png
+image_alt: "제주 렌터카 4개 플랫폼의 가격 데이터가 하나의 가격 피벗 테이블로 정리되는 매거진형 대표 이미지"
 featured: true
 ---
 
