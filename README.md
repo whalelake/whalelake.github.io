@@ -70,12 +70,19 @@ The repository generates three Korea hot-issue posts per day from Google Trends 
 - Source: `https://trends.google.com/trending/rss?geo=KR`
 - Count: top 3 trend issues
 - Category: `Current Affairs`
-- Format: signal, related news, opinion, follow-up questions, reference links
+- Format: introduction, four analysis points, `whalelake Note`, reference links
+- Enrichment: fetches up to 3 linked article pages per trend and extracts title, description, and body paragraphs when available
 
 Generate today's trend posts locally:
 
 ```bash
 python3 scripts/create_daily_posts.py
+```
+
+Skip linked article fetching and use only Google Trends RSS titles:
+
+```bash
+python3 scripts/create_daily_posts.py --no-enrich-articles
 ```
 
 Generate a specific date:

@@ -52,7 +52,7 @@ jobs:
           TARGET_DATE: ${{ steps.date.outputs.value }}
           FORCE: ${{ inputs.force }}
         run: |
-          args=(--date "$TARGET_DATE")
+          args=(--date "$TARGET_DATE" --max-articles 3 --article-timeout 8)
           if [ "$FORCE" = "true" ]; then
             args+=(--force)
           fi
