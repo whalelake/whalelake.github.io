@@ -53,7 +53,7 @@ analytics:
 pageviews:
   provider:
 
-theme_mode:
+theme_mode: light
 cdn:
 avatar:
 social_preview_image: /assets/images/posts/jeju-rental-car-price-comparison-cover.png
