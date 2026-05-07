@@ -63,15 +63,16 @@ excerpt: "Short summary shown on the home page."
 
 Suggested categories are `Development`, `Current Affairs`, `Data Analysis`, `Life`, and `Projects`.
 
-## Daily Post Automation
+## Daily Trend Post Automation
 
-The repository can generate three fixed-topic posts per day:
+The repository generates three Korea hot-issue posts per day from Google Trends RSS:
 
-- `시사`: `Current Affairs`
-- `AI`: `AI`
-- `개발`: `Development`
+- Source: `https://trends.google.com/trending/rss?geo=KR`
+- Count: top 3 trend issues
+- Category: `Current Affairs`
+- Format: signal, related news, opinion, follow-up questions, reference links
 
-Generate today's posts locally:
+Generate today's trend posts locally:
 
 ```bash
 python3 scripts/create_daily_posts.py
@@ -89,7 +90,13 @@ Existing posts are skipped by default. To overwrite the three posts for a date:
 python3 scripts/create_daily_posts.py --date 2026-05-08 --force
 ```
 
-GitHub Actions runs `.github/workflows/daily-posts.yml` every day at 09:00 KST. If new posts are created, the workflow commits them back to the repository, which triggers the Pages deployment workflow.
+For the old fixed-topic placeholders, use:
+
+```bash
+python3 scripts/create_daily_posts.py --source fixed --date 2026-05-08
+```
+
+GitHub Actions runs `.github/workflows/daily-posts.yml` every day at 09:00 KST. If new hot-issue posts are created, the workflow commits them back to the repository, which triggers the Pages deployment workflow.
 
 ## Theme
 

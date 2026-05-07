@@ -5,8 +5,15 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import email.utils
+import html
+import urllib.request
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
+
+TRENDS_RSS_URL = "https://trends.google.com/trending/rss?geo=KR"
+HT_NS = "{https://trends.google.com/trending/rss}"
 
 
 @dataclass(frozen=True)
@@ -23,6 +30,21 @@ class DailyPost:
 class CreateResult:
     created: list[Path]
     skipped: list[Path]
+
+
+@dataclass(frozen=True)
+class NewsItem:
+    title: str
+    source: str
+    url: str
+
+
+@dataclass(frozen=True)
+class TrendIssue:
+    title: str
+    approx_traffic: str
+    pub_date: str
+    news_items: tuple[NewsItem, ...]
 
 
 DAILY_POSTS: tuple[DailyPost, ...] = (
@@ -53,6 +75,33 @@ DAILY_POSTS: tuple[DailyPost, ...] = (
 )
 
 
+def clean_text(value: str | None) -> str:
+    if not value:
+        return ""
+    return html.unescape(value).strip()
+
+
+def object_particle(value: str) -> str:
+    if not value:
+        return "를"
+    last = value[-1]
+    code = ord(last)
+    if 0xAC00 <= code <= 0xD7A3:
+        return "을" if (code - 0xAC00) % 28 else "를"
+    return "을"
+
+
+def format_pub_date_kst(value: str) -> str:
+    if not value:
+        return "확인 필요"
+    try:
+        parsed = email.utils.parsedate_to_datetime(value)
+    except (TypeError, ValueError):
+        return value
+    kst = parsed.astimezone(dt.timezone(dt.timedelta(hours=9)))
+    return f"{kst:%Y-%m-%d %H:%M} KST"
+
+
 def parse_date(value: str | None) -> dt.date:
     if value:
         return dt.date.fromisoformat(value)
@@ -61,6 +110,10 @@ def parse_date(value: str | None) -> dt.date:
 
 def post_filename(post: DailyPost, target_date: dt.date) -> str:
     return f"{target_date.isoformat()}-{post.slug}-daily-note.md"
+
+
+def trend_post_filename(target_date: dt.date, index: int) -> str:
+    return f"{target_date.isoformat()}-hot-issue-{index:02d}.md"
 
 
 def render_post(post: DailyPost, target_date: dt.date) -> str:
@@ -99,6 +152,105 @@ excerpt: "{display_date}에 남기는 {post.topic} 분야의 관찰과 질문."
 """
 
 
+def fetch_google_trends_rss(url: str = TRENDS_RSS_URL, timeout: int = 20) -> str:
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "whalelake-blog-automation/1.0",
+            "Accept": "application/rss+xml, application/xml, text/xml",
+        },
+    )
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return response.read().decode("utf-8")
+
+
+def parse_trend_issues(rss_xml: str, limit: int = 3) -> list[TrendIssue]:
+    root = ET.fromstring(rss_xml)
+    issues: list[TrendIssue] = []
+
+    for item in root.findall("./channel/item"):
+        news_items: list[NewsItem] = []
+        for news in item.findall(f"{HT_NS}news_item"):
+            news_items.append(
+                NewsItem(
+                    title=clean_text(news.findtext(f"{HT_NS}news_item_title")),
+                    source=clean_text(news.findtext(f"{HT_NS}news_item_source")),
+                    url=clean_text(news.findtext(f"{HT_NS}news_item_url")),
+                )
+            )
+
+        issues.append(
+            TrendIssue(
+                title=clean_text(item.findtext("title")),
+                approx_traffic=clean_text(item.findtext(f"{HT_NS}approx_traffic")),
+                pub_date=clean_text(item.findtext("pubDate")),
+                news_items=tuple(news_items),
+            )
+        )
+
+        if len(issues) >= limit:
+            break
+
+    return issues
+
+
+def render_trend_post(issue: TrendIssue, target_date: dt.date, index: int) -> str:
+    display_date = target_date.strftime("%Y년 %m월 %d일")
+    post_time = dt.datetime.combine(target_date, dt.time(8 + index, 0))
+    safe_title = issue.title.replace('"', "'")
+    excerpt = f"{display_date} Google Trends Korea 핫이슈 '{safe_title}'{object_particle(safe_title)} 보고 남기는 관찰과 생각."
+    references = "\n".join(
+        f"- {item.source}: {item.title}" if item.source else f"- {item.title}"
+        for item in issue.news_items[:3]
+        if item.title
+    )
+    if not references:
+        references = "- Google Trends RSS에 연결된 관련 기사 없음"
+
+    source_links = "\n".join(
+        f"- [{item.source or '관련 기사'}]({item.url})"
+        for item in issue.news_items[:3]
+        if item.url
+    )
+    if not source_links:
+        source_links = "- 관련 기사 링크 없음"
+
+    return f"""---
+title: "{display_date} 핫이슈: {safe_title}"
+date: {post_time:%Y-%m-%d %H:%M:%S} +0900
+categories: [Current Affairs]
+tags: [google-trends, hot-issue, korea, daily-note]
+excerpt: "{excerpt}"
+---
+
+## 오늘의 신호
+
+- 검색어: **{issue.title}**
+- 추정 검색량: {issue.approx_traffic or "확인 필요"}
+- Google Trends 반영 시각: {format_pub_date_kst(issue.pub_date)}
+
+## 함께 뜬 기사
+
+{references}
+
+## 내 생각
+
+이 검색어가 올라왔다는 것은 사람들이 단순히 뉴스를 소비하는 수준을 넘어, 사건의 의미나 다음 전개를 직접 확인하려는 단계에 들어섰다는 신호로 볼 수 있다. 검색량은 여론 그 자체는 아니지만, 관심이 어디로 쏠리는지 보여주는 빠른 온도계다.
+
+내가 오늘 주목하는 지점은 세 가지다. 첫째, 이 이슈가 일회성 화제인지 아니면 반복될 구조적 변화의 표면인지 봐야 한다. 둘째, 관련 기사들이 같은 사실을 다르게 해석하고 있는지 확인해야 한다. 셋째, 검색어 자체가 사람들의 궁금증을 얼마나 정확히 드러내는지 살펴야 한다.
+
+## 더 확인할 질문
+
+- 이 검색어가 갑자기 오른 직접 계기는 무엇인가?
+- 관련 보도는 사실 확인, 해석, 전망을 구분하고 있는가?
+- 내일도 이어질 이슈인지, 오늘의 관심으로 끝날 이슈인지 판단할 근거는 무엇인가?
+
+## 참고 링크
+
+{source_links}
+"""
+
+
 def create_daily_posts(target_date: dt.date, output_dir: Path, force: bool = False) -> CreateResult:
     output_dir.mkdir(parents=True, exist_ok=True)
     created: list[Path] = []
@@ -116,18 +268,56 @@ def create_daily_posts(target_date: dt.date, output_dir: Path, force: bool = Fal
     return CreateResult(created=created, skipped=skipped)
 
 
+def create_trend_posts(
+    target_date: dt.date,
+    output_dir: Path,
+    issues: list[TrendIssue],
+    force: bool = False,
+) -> CreateResult:
+    if len(issues) < 3:
+        raise ValueError(f"Expected at least 3 trend issues, got {len(issues)}")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    created: list[Path] = []
+    skipped: list[Path] = []
+
+    for index, issue in enumerate(issues[:3], start=1):
+        target = output_dir / trend_post_filename(target_date, index)
+        if target.exists() and not force:
+            skipped.append(target)
+            continue
+
+        target.write_text(render_trend_post(issue, target_date, index), encoding="utf-8")
+        created.append(target)
+
+    return CreateResult(created=created, skipped=skipped)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Create three fixed-topic daily Jekyll posts.")
     parser.add_argument("--date", help="Target date in YYYY-MM-DD format. Defaults to today in Asia/Seoul.")
     parser.add_argument("--output-dir", default="_posts", help="Directory where Markdown posts are written.")
     parser.add_argument("--force", action="store_true", help="Overwrite existing posts for the date.")
+    parser.add_argument(
+        "--source",
+        choices=("trends", "fixed"),
+        default="trends",
+        help="Use Google Trends Korea hot issues or fixed topic placeholders.",
+    )
+    parser.add_argument("--trends-url", default=TRENDS_RSS_URL, help="Google Trends RSS URL.")
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
     target_date = parse_date(args.date)
-    result = create_daily_posts(target_date, Path(args.output_dir), force=args.force)
+
+    if args.source == "trends":
+        rss_xml = fetch_google_trends_rss(args.trends_url)
+        issues = parse_trend_issues(rss_xml, limit=3)
+        result = create_trend_posts(target_date, Path(args.output_dir), issues, force=args.force)
+    else:
+        result = create_daily_posts(target_date, Path(args.output_dir), force=args.force)
 
     for path in result.created:
         print(f"created {path}")

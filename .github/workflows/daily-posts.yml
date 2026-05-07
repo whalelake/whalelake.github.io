@@ -1,4 +1,4 @@
-name: "Create Daily Posts"
+name: "Create Daily Trend Posts"
 
 on:
   schedule:
@@ -11,7 +11,7 @@ on:
         required: false
         type: string
       force:
-        description: "Overwrite existing posts for the target date."
+        description: "Overwrite existing hot-issue posts for the target date."
         required: false
         default: false
         type: boolean
@@ -47,7 +47,7 @@ jobs:
             echo "value=$(TZ=Asia/Seoul date +%F)" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create daily posts
+      - name: Create daily trend posts
         env:
           TARGET_DATE: ${{ steps.date.outputs.value }}
           FORCE: ${{ inputs.force }}
@@ -61,5 +61,5 @@ jobs:
       - name: Commit generated posts
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          commit_message: "chore: create daily posts for ${{ steps.date.outputs.value }}"
+          commit_message: "chore: create daily trend posts for ${{ steps.date.outputs.value }}"
           file_pattern: "_posts/*.md"
