@@ -71,7 +71,10 @@ class CreateDailyPostsTest(unittest.TestCase):
         self.assertIn("date: 2026-05-07 13:00:00 +0900", content)
         self.assertIn("categories: [AI]", content)
         self.assertIn("tags: [ai, technology, daily-note]", content)
+        self.assertIn("faqs:", content)
+        self.assertIn("## 핵심 요약", content)
         self.assertIn("## 오늘의 질문", content)
+        self.assertIn("## 자주 묻는 질문", content)
 
     def test_create_daily_posts_writes_three_expected_files(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -133,12 +136,15 @@ class CreateDailyPostsTest(unittest.TestCase):
         self.assertIn("date: 2026-05-07 09:00:00 +0900", content)
         self.assertIn("categories: [Current Affairs]", content)
         self.assertIn("추정 검색량은 500+", content)
+        self.assertIn("faqs:", content)
+        self.assertIn("## 핵심 요약", content)
         self.assertIn("Google Trends에는 2026-05-07 11:10 KST 기준으로 반영됐습니다", content)
         self.assertIn("## 1. 먼저, 사람들이 확인하고 싶었던 것은 무엇일까", content)
         self.assertIn("기사 본문에서 확인한 단서", content)
         self.assertIn("복귀 가능성을 두고 긍정적인 방향에서 협의", content)
         self.assertIn("## whalelake Note", content)
         self.assertIn("- 뉴시스: 민지, 뉴진스 복귀하나", content)
+        self.assertIn("## 자주 묻는 질문", content)
 
     def test_extract_article_context_reads_meta_and_paragraphs(self):
         article_html = """

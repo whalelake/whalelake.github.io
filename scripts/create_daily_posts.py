@@ -101,6 +101,32 @@ def truncate_text(value: str, limit: int = 240) -> str:
     return value[: limit - 1].rstrip() + "…"
 
 
+def yaml_quote(value: str) -> str:
+    return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def render_faq_front_matter(faqs: tuple[tuple[str, str], ...]) -> str:
+    lines = ["faqs:"]
+    for question, answer in faqs:
+        lines.append(f"  - question: {yaml_quote(question)}")
+        lines.append(f"    answer: {yaml_quote(answer)}")
+    return "\n".join(lines)
+
+
+def render_key_summary(bullets: tuple[str, ...]) -> str:
+    return "## 핵심 요약\n\n" + "\n".join(f"- {bullet}" for bullet in bullets)
+
+
+def render_faq_section(faqs: tuple[tuple[str, str], ...]) -> str:
+    lines = ["## 자주 묻는 질문"]
+    for question, answer in faqs:
+        lines.append("")
+        lines.append(f"### {question}")
+        lines.append("")
+        lines.append(answer)
+    return "\n".join(lines)
+
+
 def clean_article_summary(value: str) -> str:
     summary = clean_text(value)
     stop_patterns = [
@@ -161,6 +187,25 @@ def render_post(post: DailyPost, target_date: dt.date) -> str:
     post_time = dt.datetime.combine(target_date, dt.time(post.hour, 0))
     tags = ", ".join((*post.tags, "daily-note"))
     title = f"{display_date} {post.title_label} 노트"
+    summary = (
+        f"{display_date} {post.topic} 분야에서 오늘 확인할 질문을 먼저 정리합니다.",
+        "관찰, 해석, 다음 확인할 것을 분리해 검색자가 빠르게 맥락을 잡을 수 있게 구성합니다.",
+        "하루 뒤 다시 이어 쓸 수 있도록 결론보다 판단 재료와 후속 질문을 남깁니다.",
+    )
+    faqs = (
+        (
+            f"{post.topic} 노트는 어떤 기준으로 읽으면 좋나요?",
+            f"이 글은 {post.topic} 분야의 확정 결론보다 오늘 확인할 변화와 질문을 정리하는 용도입니다.",
+        ),
+        (
+            "자동 생성 글도 검색에 도움이 되나요?",
+            "도움이 되려면 단순 요약이 아니라 관찰, 해석, 다음 행동처럼 독자가 바로 쓸 수 있는 판단 재료가 들어가야 합니다.",
+        ),
+        (
+            "다음 글에서는 무엇을 이어서 보면 좋나요?",
+            "관련 원문, 이해관계자 반응, 하루 뒤에도 이어지는 구조적 변화인지 여부를 확인하면 좋습니다.",
+        ),
+    )
 
     return f"""---
 title: "{title}"
@@ -168,7 +213,10 @@ date: {post_time:%Y-%m-%d %H:%M:%S} +0900
 categories: [{post.category}]
 tags: [{tags}]
 excerpt: "{display_date}에 남기는 {post.topic} 분야의 관찰과 질문."
+{render_faq_front_matter(faqs)}
 ---
+
+{render_key_summary(summary)}
 
 ## 오늘의 질문
 
@@ -189,6 +237,8 @@ excerpt: "{display_date}에 남기는 {post.topic} 분야의 관찰과 질문."
 - 관련 자료와 원문 확인
 - 이해관계자와 사용자 관점 정리
 - 다음 글에서 이어서 볼 질문 선정
+
+{render_faq_section(faqs)}
 """
 
 
@@ -347,6 +397,25 @@ def render_trend_post(issue: TrendIssue, target_date: dt.date, index: int) -> st
     particle = object_particle(safe_title)
     subject_particle = "은" if particle == "을" else "는"
     excerpt = f"{display_date}, 사람들이 '{safe_title}'{particle} 검색한 이유를 네 가지 포인트로 풀어본다."
+    summary = (
+        f"Google Trends Korea에서 **{issue.title}** 검색어가 눈에 띄게 올라온 배경을 정리합니다.",
+        "관련 기사 제목과 기사 본문에서 확인한 단서를 함께 보고, 단순 검색량보다 관심의 방향을 해석합니다.",
+        "마지막에는 이 이슈가 일회성 화제인지 구조적 흐름인지 판단하기 위한 질문을 남깁니다.",
+    )
+    faqs = (
+        (
+            f"왜 {issue.title} 검색어가 올랐나요?",
+            f"Google Trends Korea에 연결된 기사와 검색 흐름을 보면, 사람들이 {issue.title} 관련 사실관계와 배경을 확인하려는 수요가 커진 것으로 볼 수 있습니다.",
+        ),
+        (
+            "이 글은 어떤 자료를 바탕으로 작성됐나요?",
+            "Google Trends Korea RSS에 노출된 검색어, 추정 검색량, 관련 기사 제목과 링크, 가능한 경우 기사 본문 요약 단서를 바탕으로 작성했습니다.",
+        ),
+        (
+            "이 이슈를 볼 때 무엇을 추가로 확인해야 하나요?",
+            "직접 계기, 보도 간 해석 차이, 하루 뒤에도 관심이 이어지는 구조적 이슈인지 여부를 함께 확인하는 것이 좋습니다.",
+        ),
+    )
     references = "\n".join(
         f"- {item.source}: {item.title}" if item.source else f"- {item.title}"
         for item in issue.news_items[:3]
@@ -377,7 +446,10 @@ date: {post_time:%Y-%m-%d %H:%M:%S} +0900
 categories: [Current Affairs]
 tags: [google-trends, hot-issue, korea, daily-note]
 excerpt: "{excerpt}"
+{render_faq_front_matter(faqs)}
 ---
+
+{render_key_summary(summary)}
 
 안녕하세요. 오늘 Google Trends Korea에서 눈에 들어온 검색어는 **{issue.title}**였습니다.
 
@@ -426,6 +498,8 @@ Google Trends에 함께 묶인 기사들은 이 이슈가 어디서 출발했는
 ## 참고 링크
 
 {source_links}
+
+{render_faq_section(faqs)}
 
 _알림: 이 글은 Google Trends Korea RSS에 노출된 검색어와 관련 기사 제목을 바탕으로 작성한 자동 초안입니다. 사실관계 판단이나 투자·정책 판단을 대신하지 않습니다._
 """
