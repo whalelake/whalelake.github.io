@@ -1,0 +1,65 @@
+name: "Create Daily Posts"
+
+on:
+  schedule:
+    # 09:00 Asia/Seoul
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+    inputs:
+      target_date:
+        description: "Date to generate in YYYY-MM-DD. Defaults to today in Asia/Seoul."
+        required: false
+        type: string
+      force:
+        description: "Overwrite existing posts for the target date."
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "daily-posts"
+  cancel-in-progress: false
+
+jobs:
+  create-posts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Resolve target date
+        id: date
+        env:
+          INPUT_DATE: ${{ inputs.target_date }}
+        run: |
+          if [ -n "$INPUT_DATE" ]; then
+            echo "value=$INPUT_DATE" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=$(TZ=Asia/Seoul date +%F)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create daily posts
+        env:
+          TARGET_DATE: ${{ steps.date.outputs.value }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          args=(--date "$TARGET_DATE")
+          if [ "$FORCE" = "true" ]; then
+            args+=(--force)
+          fi
+          python3 scripts/create_daily_posts.py "${args[@]}"
+
+      - name: Commit generated posts
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "chore: create daily posts for ${{ steps.date.outputs.value }}"
+          file_pattern: "_posts/*.md"

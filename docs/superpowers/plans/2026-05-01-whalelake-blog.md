@@ -4,9 +4,9 @@
 
 **Goal:** Build the first version of the `whalelake.github.io` GitHub Pages magazine blog.
 
-**Architecture:** A Jekyll static site with Liquid layouts, Markdown posts, shared includes, and a single CSS system. GitHub Pages builds the site from the repository root.
+**Architecture:** A Jekyll static site using the Chirpy theme, Markdown posts, theme-provided layouts, and GitHub Pages Actions. GitHub Pages builds the site from the repository root.
 
-**Tech Stack:** GitHub Pages, Jekyll, Liquid, HTML, CSS, Markdown.
+**Tech Stack:** GitHub Pages, Jekyll, Chirpy, Liquid, HTML, CSS, Markdown.
 
 ---
 
@@ -21,29 +21,29 @@
 - [x] Add publishing instructions for GitHub repository setup.
 - [x] Ignore local Jekyll build outputs.
 
-### Task 2: Layout System
+### Task 2: Theme System
 
 **Files:**
-- Create: `_layouts/default.html`
-- Create: `_layouts/post.html`
-- Create: `_includes/header.html`
-- Create: `_includes/footer.html`
-- Create: `assets/css/main.css`
+- Configure: `_config.yml`
+- Use: `jekyll-theme-chirpy`
+- Use: `_tabs/*.md`
 
-- [x] Build semantic document shell and navigation.
-- [x] Build magazine post layout.
-- [x] Create responsive editorial design system.
+- [x] Configure Chirpy as the site theme.
+- [x] Use theme-provided layouts for home, posts, archives, categories, and tags.
+- [x] Keep local overrides minimal until a concrete design need appears.
 
 ### Task 3: Core Pages
 
 **Files:**
 - Create: `index.html`
-- Create: `archive.html`
-- Create: `about.md`
+- Create: `_tabs/archives.md`
+- Create: `_tabs/about.md`
+- Create: `_tabs/categories.md`
+- Create: `_tabs/tags.md`
 
-- [x] Build magazine home with featured article and latest feed.
-- [x] Build archive page.
-- [x] Build about page.
+- [x] Build home page through Chirpy's `home` layout.
+- [x] Build archive, categories, and tags pages through Chirpy tab layouts.
+- [x] Build about page as a tab.
 
 ### Task 4: First Content
 
@@ -59,9 +59,11 @@
 ### Task 5: Deployment Readiness
 
 **Files:**
-- Create: `.github/workflows/pages.yml`
+- Create: `.github/workflows/pages-deploy.yml`
 - Create: `docs/custom-domain.md`
+- Create: `Gemfile.lock`
 
 - [x] Add GitHub Pages workflow for Jekyll.
 - [x] Document future custom domain setup.
+- [x] Lock gem dependencies for reproducible CI builds.
 - [x] Verify the generated files are present and structurally complete.
